@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quadratic & Grade App</title>
+  <style>
+    /* Basic page styling */
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    /* Header section styling */
+    header {
+      padding: 1em;
+      text-align: center;
+    }
+
+    /* Layout for the main content using flexbox */
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2em;
+      padding: 2em;
+    }
+
+    /* Card-style containers for each tool */
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 1.5em;
+      width: 350px;
+    }
+
+    /* Section titles */
+    h2 {
+      margin-top: 0;
+    }
+
+    /* Label and input styling */
+    label {
+      display: block;
+      margin-top: 1em;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 0.3em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* Error message styling */
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 0.5em;
+    }
+
+    /* Result display styling */
+    .result {
+      margin-top: 1em;
+      padding: 1em;
+      border: 1px solid #999;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    /* Button styling */
+    button {
+      margin-top: 1em;
+      margin-right: 0.5em;
+      padding: 8px 16px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header section -->
+  <header>
+    <h1>Quadratic Solver & Grading System</h1>
+    <p>Enter values below to compute roots or convert scores.</p>
+  </header>
+
+  <!-- Main content area with two cards -->
+  <main>
+    <!-- Quadratic Solver Card -->
+    <div class="card">
+      <h2>Quadratic Solver</h2>
+      <!-- Input fields for coefficients a, b, c -->
+      <label>a: <input type="number" id="a" /></label>
+      <label>b: <input type="number" id="b" /></label>
+      <label>c: <input type="number" id="c" /></label>
+      <!-- Error message area -->
+      <div class="error" id="quad-error"></div>
+      <!-- Action buttons -->
+      <button onclick="solveQuadratic()">Compute</button>
+      <button onclick="resetQuadratic()">Reset</button>
+      <!-- Result display area -->
+      <div class="result" id="quad-result"></div>
+    </div>
+
+    <!-- Grading System Card -->
+    <div class="card">
+      <h2>Grading System</h2>
+      <!-- Input field for score -->
+      <label>Score (0–100): <input type="number" id="score" /></label>
+      <!-- Error message area -->
+      <div class="error" id="grade-error"></div>
+      <!-- Action buttons -->
+      <button onclick="convertGrade()">Compute</button>
+      <button onclick="resetGrade()">Reset</button>
+      <!-- Result display area -->
+      <div class="result" id="grade-result"></div>
+    </div>
+  </main>
+
+  <!-- JavaScript logic -->
+  <script>
+    // Function to solve the quadratic equation
+    function solveQuadratic() {
+      // Get input values and convert to numbers
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const c = parseFloat(document.getElementById("c").value);
+      const error = document.getElementById("quad-error");
+      const result = document.getElementById("quad-result");
+      error.textContent = "";
+      result.textContent = "";
+
+      // Validate inputs
+      if (isNaN(a) || isNaN(b) || isNaN(c)) {
+        error.textContent = "Please enter valid numbers for a, b, and c.";
+        return;
+      }
+      if (a === 0) {
+        error.textContent = "Coefficient 'a' must not be zero.";
+        return;
+      }
+
+      // Calculate discriminant
+      const D = b * b - 4 * a * c;
+      let nature = "";
+      let roots = "";
+
+      // Determine nature of roots and compute them
+      if (D > 0) {
+        nature = "Two distinct real roots";
+        const r1 = (-b + Math.sqrt(D)) / (2 * a);
+        const r2 = (-b - Math.sqrt(D)) / (2 * a);
+        roots = `x₁ = ${r1.toFixed(3)}, x₂ = ${r2.toFixed(3)}`;
+      } else if (D === 0) {
+        nature = "One real repeated root";
+        const r = -b / (2 * a);
+        roots = `x = ${r.toFixed(3)}`;
+      } else {
+        nature = "Two complex conjugate roots";
+        const real = (-b / (2 * a)).toFixed(3);
+        const imag = (Math.sqrt(-D) / (2 * a)).toFixed(3);
+        roots = `x₁ = ${real} + ${imag}i, x₂ = ${real} - ${imag}i`;
+      }
+
+      // Display results
+      result.innerHTML = `
+        Discriminant (D): ${D.toFixed(3)}<br>
+        Nature of roots: ${nature}<br>
+        Roots: ${roots}
+      `;
+    }
+
+    // Function to reset quadratic inputs and results
+    function resetQuadratic() {
+      document.getElementById("a").value = "";
+      document.getElementById("b").value = "";
+      document.getElementById("c").value = "";
+      document.getElementById("quad-error").textContent = "";
+      document.getElementById("quad-result").textContent = "";
+    }
+
+    // Function to convert score to grade
+    function convertGrade() {
+      const score = parseInt(document.getElementById("score").value);
+      const error = document.getElementById("grade-error");
+      const result = document.getElementById("grade-result");
+      error.textContent = "";
+      result.textContent = "";
+
+      // Validate score input
+      if (isNaN(score) || score < 0 || score > 100) {
+        error.textContent = "Please enter a score between 0 and 100.";
+        return;
+      }
+
+      // Determine grade based on score
+      let grade = "";
+      if (score >= 85) grade = "A+";
+      else if (score >= 75) grade = "A";
+      else if (score >= 65) grade = "B+";
+      else if (score >= 60) grade = "B";
+      else if (score >= 55) grade = "C+";
+      else if (score >= 50) grade = "C";
+      else grade = "D";
+
+      // Display result
+      result.textContent = `Score ${score} → Grade ${grade}`;
+    }
+
+    // Function to reset grading inputs and results
+    function resetGrade() {
+      document.getElementById("score").value = "";
+      document.getElementById("grade-error").textContent = "";
+      document.getElementById("grade-result").textContent = "";
+    }
+  </script>
+</body>
+</html>
